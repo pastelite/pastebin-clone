@@ -87,12 +87,12 @@ export const saveFile: RequestHandler = async (req,res,next) => {
 
   // Save file
   writeFile(`./text/${url}.txt`,body.data,'utf8')
-  db.codes.create({
+  let data = await db.codes.create({
     data: {
       url,
       editCode
     }
   })
 
-  res.status(200).json({message:"successfully write a file",url,editCode})
+  return res.status(200).json({message:"successfully write a file",url,editCode})
 }

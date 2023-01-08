@@ -8,6 +8,7 @@ generator client {
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
+  // url = "mysql://root:kanacan.@localhost:3306/pastebinclone"
 }
 
 model Codes {
