@@ -1,12 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./AppLayout";
+import App from "./routes/_Layout";
 import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { Header } from "./components/Header";
-import { ShowText } from "./components/ShowText";
 import axios from "axios";
-import { InputBox } from "./components/InputBox";
+import { InputPage } from "./routes/InputPage";
+import { ShowPage } from "./routes/ShowPage";
 
 const router = createBrowserRouter([
   {
@@ -15,12 +14,11 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <InputBox></InputBox>,
+        element: <InputPage/>,
       },
       {
         path: "/:link",
         loader: async ({ params }) => {
-          let link = params.link;
           let data: any = {};
           await axios
             .get(`/api/${params.link}`)
@@ -35,7 +33,7 @@ const router = createBrowserRouter([
           return data;
           // return data
         },
-        element: <ShowText />,
+        element: <ShowPage/>,
       },
     ],
   },
