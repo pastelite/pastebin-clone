@@ -13,17 +13,19 @@ export function ShowPage() {
   return (
     <>
       {b.state?.notice && <div>{b.state.notice}</div>}
-      <Editor value={data.data||notFoundMessage} readOnly/>
+      <Editor value={data.data || notFoundMessage} readOnly />
     </>
   );
 }
 
-const notFoundMessage = [{
-  type: "header",
-  level: 1,
-  children: [
-    {text:"Not found"}
-  ]
-},
-{type:"paragraph",children:[{text:"please makes sure URL is correct"}]}
-]
+const notFoundMessage = [
+  {
+    type: "header",
+    level: 1,
+    children: [{ text: "Not found" }],
+  },
+  {
+    type: "paragraph",
+    children: [{ text: "please makes sure URL is correct" }],
+  },
+];

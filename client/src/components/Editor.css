@@ -18,17 +18,22 @@ h5 {
   font-size: small;
 }
 
-h1,h2,h3,h4,h5 {
+h1,
+h2,
+h3,
+h4,
+h5 {
   font-weight: bold;
-  margin-bottom: .5em;
+  margin-bottom: 0.5em;
 }
 
 p {
-  margin-bottom: .5em;
+  margin-bottom: 0.5em;
 }
 
 ul {
   list-style-type: circle;
+  border: 1px solid red;
   margin-left: 1.5em;
 }
 

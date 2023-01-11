@@ -30,33 +30,27 @@ export let InputPage: React.FC = () => {
     console.log(JSON.stringify(editor.children));
 
     // save data
-    try {
-      let req = await axios.post("/api/",{
-        data: JSON.stringify(editor.children)
-      })
+    // try {
+    //   let req = await axios.post("/api/",{
+    //     data: JSON.stringify(editor.children)
+    //   })
 
-      let data = req.data
-      navigate(`/${data.url}`,{state: {
-        notice: `editcode: ${data.editCode}`
-      }})
+    //   let data = req.data
+    //   navigate(`/${data.url}`,{state: {
+    //     notice: `editcode: ${data.editCode}`
+    //   }})
 
-    } catch (e) {
-      navigate('/idk',{state: {
-        notice: "Something wrong"
-      }})
-      console.log(e)
-    }
-    // .then(e=>console.log(e)).catch(e=>console.log(e))
-
-    // navigate
-    // navigate('/about',{state: {
-    //   notice: "String"
-    // }})
+    // } catch (e) {
+    //   navigate('/idk',{state: {
+    //     notice: "Something wrong"
+    //   }})
+    //   console.log(e)
+    // }
   }
 
   return (
     <>
-      <Editor editor={editor}/>
+      <Editor editor={editor} />
       <div className="fixed right-0 bottom-0">
         <button
           className="bg-green-300 px-4 py-2 m-4 border-green-800 border-2"

@@ -30,7 +30,7 @@ const router = createBrowserRouter([
               console.log(e);
               data = { message: "Not found", error: e };
             });
-          
+
           // return data;
           return data;
           // return data
