@@ -1,0 +1,45 @@
+h1 {
+  font-size: xx-large;
+}
+
+h2 {
+  font-size: x-large;
+}
+
+h3 {
+  font-size: larger;
+}
+
+h4 {
+  font-size: medium;
+}
+
+h5 {
+  font-size: small;
+}
+
+h1,h2,h3,h4,h5 {
+  font-weight: bold;
+  margin-bottom: .5em;
+}
+
+p {
+  margin-bottom: .5em;
+}
+
+ul {
+  list-style-type: circle;
+  margin-left: 1.5em;
+}
+
+.toolbar {
+  @apply p-2 rounded-md border-[#4CE0B388] border-[1px] m-2;
+}
+
+.toolbar button {
+  @apply border-2 px-2 py-1 mr-2 rounded-sm transition-all duration-200 border-[#FFFFFF33];
+}
+
+.toolbar button.include {
+  @apply border-[#4CE0B3];
+}

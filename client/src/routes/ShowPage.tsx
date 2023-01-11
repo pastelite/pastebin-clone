@@ -1,6 +1,8 @@
 import { Component, ReactNode, useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, useLoaderData, useLocation } from "react-router-dom";
+import { Editable, Slate } from "slate-react";
+import { Editor } from "../components/Editor";
 
 export function ShowPage() {
   let data: any = useLoaderData();
@@ -11,13 +13,17 @@ export function ShowPage() {
   return (
     <>
       {b.state?.notice && <div>{b.state.notice}</div>}
-      <div className="bg-red-400 m-2 flex-grow">
-        {data.data ? (
-          <div dangerouslySetInnerHTML={{ __html: data.data }} />
-        ) : (
-          "Not Found"
-        )}
-      </div>
+      <Editor value={data.data||notFoundMessage} readOnly/>
     </>
   );
 }
+
+const notFoundMessage = [{
+  type: "header",
+  level: 1,
+  children: [
+    {text:"Not found"}
+  ]
+},
+{type:"paragraph",children:[{text:"please makes sure URL is correct"}]}
+]

@@ -14,7 +14,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <InputPage/>,
+        element: <InputPage />,
       },
       {
         path: "/:link",
@@ -23,17 +23,19 @@ const router = createBrowserRouter([
           await axios
             .get(`/api/${params.link}`)
             .then((a) => {
-              console.log(a);
-              data = a.data;
+              // console.log(a.data.data);
+              data.data = JSON.parse(a.data.data);
             })
             .catch((e) => {
               console.log(e);
-              data = { message: "Not found" };
+              data = { message: "Not found", error: e };
             });
+          
+          // return data;
           return data;
           // return data
         },
-        element: <ShowPage/>,
+        element: <ShowPage />,
       },
     ],
   },
