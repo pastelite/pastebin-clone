@@ -27,7 +27,7 @@ import "./Editor.css";
 
 type BasicElement = { type: "paragraph"; children: AllText[] };
 type Header = { type: "header"; children: AllText[]; level: number };
-type List = { type: "list"; children: (ListItemData | ListItemList)[] };
+type List = { type: "list"; children: (ListItemData | List)[] };
 type ListItemData = {
   type: "listItem";
   children: AllText[];
@@ -50,7 +50,7 @@ type AllText = NormalText;
 
 declare module "slate" {
   interface CustomTypes {
-    Editor: BaseEditor;
+    Editor: BaseEditor | ReactEditor;
     Element: AllElement;
     Text: AllText;
   }
@@ -133,7 +133,7 @@ const defaultValue: Descendant[] = [
         children: [{ text: "second option" }],
       },
       {
-        type: "listItemList",
+        type: "list",
         children: [
           {
             type: "listItem",
@@ -154,6 +154,20 @@ function onKeyDownHandler(
   editor: BaseEditor
 ) {
   let nodes = getCurrentNodes(editor); 
+  let currentElement = nodes.at(-1);
+  if (!editor.selection || !currentElement) return;
+
+  // anchor/focus element
+  let anchorElementPath = editor.selection.anchor.path.slice(0,-1)
+  let anchorElement = Node.ancestor(editor,anchorElementPath)
+  let focusElementPath = editor.selection.focus.path.slice(0,-1)
+  let focusElement = Node.ancestor(editor,focusElementPath)
+
+  // prior and latter
+  if (Path.isBefore(anchorElementPath, focusElementPath)) {
+    
+  }
+
 
   // Handler for list
   if (SlateEditor.isBlock(editor, nodes[0][0]) && nodes[0][0].type == "list") {
@@ -161,8 +175,7 @@ function onKeyDownHandler(
     // if (
     //   e.key == "Backspace" &&
     //   // selection is the same and offset == first
-    //   JSON.stringify(editor.selection?.anchor.path) ==
-    //     JSON.stringify(editor.selection?.focus.path) &&
+    //    &&
     //   editor.selection?.anchor.offset == 0
     // ) {
     //   e.preventDefault();
@@ -228,6 +241,40 @@ function onKeyDownHandler(
       }
     }
     // console.log(SlateEditor.isBlock(editor,lastNode[0]) && lastNode.)
+  }
+
+  // Enter key
+  if (e.key == "Enter") {
+
+    // if last Element
+    if (editor.selection && currentElement && SlateEditor.isEnd(editor,editor.selection?.anchor,currentElement[1])) {
+      e.preventDefault()
+
+      // if it's an item
+      if (SlateEditor.isBlock(editor,currentElement[0]) && currentElement[0].type == "listItem") {
+        SlateEditor.insertNode(editor,{type:"listItem",children:[{text:""}]})
+      } else {
+        SlateEditor.insertNode(editor,{type:"paragraph",children:[{text:""}]})
+      }
+    }
+  }
+
+  // Backspace / Delete problem fix
+  // The problem: default delete took data from the later element instead of prior
+  // This makes menu go outside
+  if ((e.key == "Backspace" || e.key == "Delete") &&
+  !Path.equals(editor.selection.anchor.path,editor.selection.focus.path)) {
+    e.preventDefault()
+
+    // delete and set type the same as the before one
+    Transforms.delete(editor)
+    if (Path.isBefore(anchorElementPath, focusElementPath)) {
+      // @ts-ignore
+      Transforms.setNodes(editor,anchorElement,{at:anchorElementPath})
+    } else {
+      // @ts-ignore
+      Transforms.setNodes(editor,focusElement,{at:focusElementPath})
+    }
   }
 }
 
@@ -393,7 +440,7 @@ function addList(editor: BaseEditor) {
       Transforms.setNodes(editor, { type: "listItem" });
       Transforms.wrapNodes(editor, { type: "list", children: [] });
     } else {
-      Transforms.wrapNodes(editor, { type: "listItemList", children: [] });
+      Transforms.wrapNodes(editor, { type: "list", children: [] });
     }
 
     // check previous and next node
@@ -432,16 +479,15 @@ function removeList(editor: BaseEditor) {
       .forEach((e) => {
         let currentItem = e;
         let parentItem = Node.parent(editor, currentItem[1]);
-        // let parentItem = [Node.parent(editor,e[1]), e[1].slice(0,-1)]
 
         if (
           SlateEditor.isBlock(editor, currentItem[0]) &&
           currentItem[0].type == "listItem"
         ) {
-          // if parentNode = list then convert to paragraph
+          // if parentNode = top then convert to paragraph
           if (
             SlateEditor.isBlock(editor, parentItem) &&
-            parentItem.type == "list"
+            currentItem[1].length == 2
           ) {
             Transforms.setNodes(
               editor,
