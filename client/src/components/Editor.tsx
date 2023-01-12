@@ -10,6 +10,7 @@ import {
   Path,
   Node,
   NodeMatch,
+  Ancestor,
 } from "slate";
 import {
   Editable,
@@ -157,17 +158,17 @@ function onKeyDownHandler(
   // Handler for list
   if (SlateEditor.isBlock(editor, nodes[0][0]) && nodes[0][0].type == "list") {
     // Backspace at front
-    if (
-      e.key == "Backspace" &&
-      // selection is the same and offset == first
-      JSON.stringify(editor.selection?.anchor.path) ==
-        JSON.stringify(editor.selection?.focus.path) &&
-      editor.selection?.anchor.offset == 0
-    ) {
-      e.preventDefault();
+    // if (
+    //   e.key == "Backspace" &&
+    //   // selection is the same and offset == first
+    //   JSON.stringify(editor.selection?.anchor.path) ==
+    //     JSON.stringify(editor.selection?.focus.path) &&
+    //   editor.selection?.anchor.offset == 0
+    // ) {
+    //   e.preventDefault();
 
-      removeList(editor);
-    }
+    //   removeList(editor);
+    // }
 
     // Tab
     if (
@@ -389,70 +390,33 @@ function addList(editor: BaseEditor) {
   if (SlateEditor.isBlock(editor, firstChild)) {
     // check if nodes is not a list
     if (firstChild.type !== "list") {
-      // Transforms.setNodes(editor, { type: "listItem" });
-      // Transforms.wrapNodes(editor, { type: "list", children: [] });
-
-      let prevNode = Node.ancestor(editor,Path.previous(nodes[0][1]))
-      let nextNode = Node.ancestor(editor,Path.next(nodes[0][1]))
-
       Transforms.setNodes(editor, { type: "listItem" });
       Transforms.wrapNodes(editor, { type: "list", children: [] });
-
-      if (SlateEditor.isBlock(editor,nextNode) && nextNode.type == "list") {
-        Transforms.mergeNodes(editor, { at: Path.next(nodes[0][1])})
-      }
-
-      if (SlateEditor.isBlock(editor,prevNode) && prevNode.type == "list") {
-        Transforms.mergeNodes(editor, { at: nodes[0][1]})
-      }
-
-      // // Looking nearby
-      // let prevNode = Node.ancestor(editor,Path.previous(nodes[0][1]))
-      // let nextNode = Node.ancestor(editor,Path.next(nodes[0][1]))
-
-      // let isPrevNodeList = SlateEditor.isBlock(editor,prevNode) && prevNode.type == "list"
-      // let isNextNodeList = SlateEditor.isBlock(editor,nextNode) && nextNode.type == "list"
-
-      // if (!isPrevNodeList && !isNextNodeList) {
-      //   Transforms.setNodes(editor, { type: "listItem" });
-      //   Transforms.wrapNodes(editor, { type: "list", children: [] });
-      // } else if (isPrevNodeList && !isNextNodeList) {
-      //   // // count children
-      //   // let childCount = prevNode.children.length
-      //   // // add children to path
-      //   // let path = [...Path.previous(nodes[0][1]),childCount]
-      //   // // transform
-      //   // Transforms.setNodes(editor, { type: "listItem" });
-      //   // Transforms.moveNodes(editor,{
-      //   //   to:path
-      //   // })
-      //   Transforms.setNodes(editor, { type: "listItem" });
-      //   Transforms.wrapNodes(editor, { type: "list", children: [] });
-      //   Transforms.mergeNodes(editor, { at: nodes[0][1]})
-      // } else if (!isPrevNodeList && isNextNodeList) {
-      //   // // add children to path
-      //   // let path = [...Path.next(nodes[0][1]),0]
-      //   // // transform
-      //   // Transforms.setNodes(editor, { type: "listItem" });
-      //   // Transforms.moveNodes(editor,{
-      //   //   to:path
-      //   // })
-      //   Transforms.setNodes(editor, { type: "listItem" });
-      //   Transforms.wrapNodes(editor, { type: "list", children: [] });
-      //   Transforms.mergeNodes(editor, { at: Path.next(nodes[0][1])})
-      // } else {
-      //   Transforms.setNodes(editor, { type: "listItem" });
-      //   Transforms.wrapNodes(editor, { type: "list", children: [] });
-      //   Transforms.mergeNodes(editor, {          at: Path.next(nodes[0][1])        })
-      //   Transforms.mergeNodes(editor, {          at: nodes[0][1]        })
-      // }
-      // console.log(prevNode,nextNode)
     } else {
       Transforms.wrapNodes(editor, { type: "listItemList", children: [] });
     }
-  }
 
-  // console.log(nodes)
+    // check previous and next node
+    let curNode = nodes.at(-1)
+    if (!curNode) return
+
+    let prevNode: Ancestor | undefined, nextNode: Ancestor |undefined
+
+    try {
+      prevNode = Node.ancestor(editor,Path.previous(curNode[1]))
+      nextNode = Node.ancestor(editor,Path.next(curNode[1]))
+    } catch(e) {}
+
+    // merge node
+
+    if (SlateEditor.isBlock(editor,nextNode) && (nextNode.type == "list" || nextNode.type == "listItemList")) {
+      Transforms.mergeNodes(editor, { at: Path.next(curNode[1])})
+    }
+
+    if (SlateEditor.isBlock(editor,prevNode) && (prevNode.type == "list" || prevNode.type == "listItemList")) {
+      Transforms.mergeNodes(editor, { at: curNode[1]})
+    }
+  }
 }
 
 function removeList(editor: BaseEditor) {
