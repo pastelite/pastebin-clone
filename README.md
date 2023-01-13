@@ -2,7 +2,7 @@
 A pastebin clone
 
 ## Why?
-Why not. Original pastebin editor have no
+Why not.
 
 ## Todo
 - [x] Save and load text
