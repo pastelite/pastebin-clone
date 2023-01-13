@@ -1,0 +1,11 @@
+.bottomBar {
+  @apply m-2 flex items-center;
+}
+
+.bottomBar button {
+  @apply bg-[#4CE0B3] py-1 px-2 text-black rounded-md;
+}
+
+.bottomBar input[type=text] {
+  @apply p-1 mx-2 rounded-md bg-white/20;
+}

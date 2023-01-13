@@ -164,8 +164,15 @@ function onKeyDownHandler(
   let focusElement = Node.ancestor(editor,focusElementPath)
 
   // prior and latter
+  let priorElement: [Ancestor,number[]]
+  let latterElement: [Ancestor,number[]]
+
   if (Path.isBefore(anchorElementPath, focusElementPath)) {
-    
+    priorElement = [anchorElement,anchorElementPath]
+    latterElement = [focusElement,focusElementPath]
+  } else {
+    latterElement = [anchorElement,anchorElementPath]
+    priorElement = [focusElement,focusElementPath]
   }
 
 
@@ -247,11 +254,15 @@ function onKeyDownHandler(
   if (e.key == "Enter") {
 
     // if last Element
-    if (editor.selection && currentElement && SlateEditor.isEnd(editor,editor.selection?.anchor,currentElement[1])) {
+    // There's a bug but I don't think i want to fix
+    // if select all element and press enter the type of top element will become prior element
+    // if the prior element is in the start it'll add new line instead
+    if (SlateEditor.isEnd(editor,editor.selection.anchor,currentElement[1])) {
+    //   console.log("isEnd")
       e.preventDefault()
 
       // if it's an item
-      if (SlateEditor.isBlock(editor,currentElement[0]) && currentElement[0].type == "listItem") {
+      if (SlateEditor.isBlock(editor,priorElement[0]) && priorElement[0].type == "listItem") {
         SlateEditor.insertNode(editor,{type:"listItem",children:[{text:""}]})
       } else {
         SlateEditor.insertNode(editor,{type:"paragraph",children:[{text:""}]})
@@ -268,13 +279,14 @@ function onKeyDownHandler(
 
     // delete and set type the same as the before one
     Transforms.delete(editor)
-    if (Path.isBefore(anchorElementPath, focusElementPath)) {
-      // @ts-ignore
-      Transforms.setNodes(editor,anchorElement,{at:anchorElementPath})
-    } else {
-      // @ts-ignore
-      Transforms.setNodes(editor,focusElement,{at:focusElementPath})
-    }
+    Transforms.setNodes(editor,priorElement[0],{at:priorElement[1]})
+    // if (Path.isBefore(anchorElementPath, focusElementPath)) {
+    //   // @ts-ignore
+    //   Transforms.setNodes(editor,anchorElement,{at:anchorElementPath})
+    // } else {
+    //   // @ts-ignore
+    //   Transforms.setNodes(editor,focusElement,{at:focusElementPath})
+    // }
   }
 }
 

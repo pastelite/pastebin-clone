@@ -3,7 +3,7 @@ import { readFile, writeFile } from "fs/promises";
 import config from "../config";
 import { existsSync } from "fs";
 import { randomBytes } from "crypto";
-import { PrismaClient} from "@prisma/client";
+import { PrismaClient, prisma} from "@prisma/client";
 
 const db = new PrismaClient()
 
@@ -95,4 +95,44 @@ export const saveFile: RequestHandler = async (req,res,next) => {
   })
 
   return res.status(200).json({message:"successfully write a file",url,editCode})
+}
+
+export const editCodeCheck: RequestHandler = async (req,res,next) => {
+  // let editCode = req.query.editCode
+  let authorizationKey = req.headers.authorization
+  console.log(authorizationKey)
+  let editCode: string
+  if (authorizationKey?.slice(0,6).toLowerCase() != "bearer") editCode = ""
+  else editCode = authorizationKey?.slice(7) 
+   
+  // if (editCode?.slice(0,6) != "Bearer") console.log(req.headers.authorization?.slice(0))
+  let url = req.params.id
+
+  if (!editCode) {return res.status(300).json({message: "edit code is needed"})}
+  if (!url) {return res.status(300).json({message: "url is needed"})}
+
+  let codes = await db.codes.findFirst({where:{url}})
+  if (!codes) {
+    return res.status(404).json({message:"cannot found code from the url, either it's not exist or it cannot be edited"})
+  }
+
+  // check code
+  if (codes.editCode !== editCode) {
+    return res.status(401).json({message: "wrong edit code",editCode})
+  } else {
+    req.codes = codes
+    return next()
+  }
+}
+
+export const editFile: RequestHandler = async (req,res,next) => {
+  let data = req.body.data
+  let url = req.params.id
+
+  if (!data) {
+    return res.status(300).json({message: "property text is needed for a request"})
+  }
+
+  writeFile(`./text/${url}.txt`,data,'utf8')
+  return res.status(200).json({message:"successfully write a file",url})
 }
