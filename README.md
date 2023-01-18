@@ -7,6 +7,6 @@ Why not.
 ## Todo
 - [x] Save and load text
 - [x] Basic Editor
-- [ ] Edit code
+- [x] Edit code
 - [ ] Encryption
 

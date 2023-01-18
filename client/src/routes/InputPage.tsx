@@ -30,22 +30,22 @@ export let InputPage: React.FC = () => {
     console.log(JSON.stringify(editor.children));
 
     // save data
-    // try {
-    //   let req = await axios.post("/api/",{
-    //     data: JSON.stringify(editor.children)
-    //   })
+    try {
+      let req = await axios.post("/api/",{
+        data: JSON.stringify(editor.children)
+      })
 
-    //   let data = req.data
-    //   navigate(`/${data.url}`,{state: {
-    //     notice: `editcode: ${data.editCode}`
-    //   }})
+      let data = req.data
+      navigate(`/${data.url}`,{state: {
+        notice: `editcode: ${data.editCode}`
+      }})
 
-    // } catch (e) {
-    //   navigate('/idk',{state: {
-    //     notice: "Something wrong"
-    //   }})
-    //   console.log(e)
-    // }
+    } catch (e) {
+      navigate('/idk',{state: {
+        notice: "Something wrong"
+      }})
+      console.log(e)
+    }
   }
 
   return (

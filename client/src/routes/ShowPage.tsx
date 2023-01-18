@@ -1,13 +1,16 @@
-import { Component, ReactNode, useEffect, useRef, useState } from "react";
+import { Component, MouseEventHandler, ReactNode, useEffect, useRef, useState } from "react";
 import axios from "axios";
-import { useParams, useLoaderData, useLocation } from "react-router-dom";
-import { Editable, Slate } from "slate-react";
+import { useParams, useLoaderData, useLocation, useNavigate } from "react-router-dom";
+import { Editable, Slate, withReact } from "slate-react";
 import { Editor } from "../components/Editor";
 import BottomBar from "../components/BottomBar";
+import { createEditor } from "slate";
 
 export function ShowPage() {
+  let navigate = useNavigate()
   let data: any = useLoaderData();
   let b = useLocation();
+  const [editor] = useState(() => withReact(createEditor()));
 
   console.log(JSON.stringify(b));
 
@@ -18,8 +21,10 @@ export function ShowPage() {
 
   return (
     <>
-      {b.state?.notice && <div>{b.state.notice}</div>}
-      <Editor value={data.data || notFoundMessage} readOnly={!editable} />
+      {b.state?.notice && 
+      <div className="mx-3 my-1">{b.state.notice}</div>
+      }
+      <Editor value={data.data || notFoundMessage} readOnly={!editable} editor={editor}/>
       {data.data &&
         <BottomBar>
           <button onClick={()=>setEditState(e=>!e)}>
@@ -42,6 +47,17 @@ export function ShowPage() {
               // console.log("false wtf")
             }
             }>Edit!</button>
+            {
+              editable &&
+              <button className="ml-2" onClick={async e=>{
+                if (await editUsingCode(data.url,editCodeInput.current?.value||"",editResponse.current,JSON.stringify(editor.children))) {
+                  console.log("good!")
+                  navigate(0)
+                } else {
+                  console.log("something wrong")
+                }
+              }}>Submit</button>
+            }
             <div className="mx-2" ref={editResponse}></div>
             </>
           }
@@ -57,6 +73,25 @@ export function ShowPage() {
     </>
   );
 }
+
+async function editUsingCode(url: string, editCode: string, element?: HTMLDivElement | null,data?: string): Promise<boolean> {
+  console.log(editCode)
+  try {
+    let res = await axios.post(`/api/${url}/edit`,{data},{headers:{'Authorization': `BEARER ${editCode}`}})
+    return true
+  }catch(e){
+    console.log(e)
+    return false
+  }
+}
+
+// const onSubmit: MouseEventHandler<HTMLButtonElement> = async () => {
+//   try {
+//     let res = await axios.get(`/api/${url}/edit`,{headers:{'Authorization': `BEARER ${editCode}`}})
+//   } catch(e) {
+//     console.log(e)
+//   }
+// }
 
 const notFoundMessage = [
   {

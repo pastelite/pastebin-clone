@@ -102,7 +102,10 @@ export const editCodeCheck: RequestHandler = async (req,res,next) => {
   let authorizationKey = req.headers.authorization
   console.log(authorizationKey)
   let editCode: string
-  if (authorizationKey?.slice(0,6).toLowerCase() != "bearer") editCode = ""
+  if (authorizationKey?.slice(0,6).toLowerCase() != "bearer") {
+    console.log(authorizationKey)
+    editCode = ""
+  }
   else editCode = authorizationKey?.slice(7) 
    
   // if (editCode?.slice(0,6) != "Bearer") console.log(req.headers.authorization?.slice(0))
@@ -130,7 +133,7 @@ export const editFile: RequestHandler = async (req,res,next) => {
   let url = req.params.id
 
   if (!data) {
-    return res.status(300).json({message: "property text is needed for a request"})
+    return res.status(300).json({message: "property data is needed for a request"})
   }
 
   writeFile(`./text/${url}.txt`,data,'utf8')
