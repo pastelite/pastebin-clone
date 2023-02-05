@@ -153,28 +153,27 @@ function onKeyDownHandler(
   e: React.KeyboardEvent<HTMLDivElement>,
   editor: BaseEditor
 ) {
-  let nodes = getCurrentNodes(editor); 
+  let nodes = getCurrentNodes(editor);
   let currentElement = nodes.at(-1);
   if (!editor.selection || !currentElement) return;
 
   // anchor/focus element
-  let anchorElementPath = editor.selection.anchor.path.slice(0,-1)
-  let anchorElement = Node.ancestor(editor,anchorElementPath)
-  let focusElementPath = editor.selection.focus.path.slice(0,-1)
-  let focusElement = Node.ancestor(editor,focusElementPath)
+  let anchorElementPath = editor.selection.anchor.path.slice(0, -1);
+  let anchorElement = Node.ancestor(editor, anchorElementPath);
+  let focusElementPath = editor.selection.focus.path.slice(0, -1);
+  let focusElement = Node.ancestor(editor, focusElementPath);
 
   // prior and latter
-  let priorElement: [Ancestor,number[]]
-  let latterElement: [Ancestor,number[]]
+  let priorElement: [Ancestor, number[]];
+  let latterElement: [Ancestor, number[]];
 
   if (Path.isBefore(anchorElementPath, focusElementPath)) {
-    priorElement = [anchorElement,anchorElementPath]
-    latterElement = [focusElement,focusElementPath]
+    priorElement = [anchorElement, anchorElementPath];
+    latterElement = [focusElement, focusElementPath];
   } else {
-    latterElement = [anchorElement,anchorElementPath]
-    priorElement = [focusElement,focusElementPath]
+    latterElement = [anchorElement, anchorElementPath];
+    priorElement = [focusElement, focusElementPath];
   }
-
 
   // Handler for list
   if (SlateEditor.isBlock(editor, nodes[0][0]) && nodes[0][0].type == "list") {
@@ -225,25 +224,27 @@ function onKeyDownHandler(
 
   // Test . key
   if (e.key == ".") {
-    let lastNode = nodes.at(-1)
+    let lastNode = nodes.at(-1);
     if (!lastNode) return;
 
-    if (SlateEditor.isBlock(editor,lastNode[0]) && lastNode[0].children.length==1) {
-      let childPath = lastNode[1]
-      let children = lastNode[0].children[0]
+    if (
+      SlateEditor.isBlock(editor, lastNode[0]) &&
+      lastNode[0].children.length == 1
+    ) {
+      let childPath = lastNode[1];
+      let children = lastNode[0].children[0];
       if (children.type == undefined || children.type == "text") {
-
         // check if text is number
         if (!isNaN(+children.text)) {
           // addList(editor)
-          let nodes = Node.descendant(editor,childPath)
+          let nodes = Node.descendant(editor, childPath);
           // @ts-ignore
-          nodes.children.forEach(e => {
-            console.log(e)
+          nodes.children.forEach((e) => {
+            console.log(e);
           });
           // Transforms.setNodes(editor,{children:[{text:"test"}]})
-          console.log(nodes)
-          console.log(+children.text)
+          console.log(nodes);
+          console.log(+children.text);
         }
       }
     }
@@ -252,20 +253,28 @@ function onKeyDownHandler(
 
   // Enter key
   if (e.key == "Enter") {
-
     // if last Element
     // There's a bug but I don't think i want to fix
     // if select all element and press enter the type of top element will become prior element
     // if the prior element is in the start it'll add new line instead
-    if (SlateEditor.isEnd(editor,editor.selection.anchor,currentElement[1])) {
-    //   console.log("isEnd")
-      e.preventDefault()
+    if (SlateEditor.isEnd(editor, editor.selection.anchor, currentElement[1])) {
+      //   console.log("isEnd")
+      e.preventDefault();
 
       // if it's an item
-      if (SlateEditor.isBlock(editor,priorElement[0]) && priorElement[0].type == "listItem") {
-        SlateEditor.insertNode(editor,{type:"listItem",children:[{text:""}]})
+      if (
+        SlateEditor.isBlock(editor, priorElement[0]) &&
+        priorElement[0].type == "listItem"
+      ) {
+        SlateEditor.insertNode(editor, {
+          type: "listItem",
+          children: [{ text: "" }],
+        });
       } else {
-        SlateEditor.insertNode(editor,{type:"paragraph",children:[{text:""}]})
+        SlateEditor.insertNode(editor, {
+          type: "paragraph",
+          children: [{ text: "" }],
+        });
       }
     }
   }
@@ -273,13 +282,15 @@ function onKeyDownHandler(
   // Backspace / Delete problem fix
   // The problem: default delete took data from the later element instead of prior
   // This makes menu go outside
-  if ((e.key == "Backspace" || e.key == "Delete") &&
-  !Path.equals(editor.selection.anchor.path,editor.selection.focus.path)) {
-    e.preventDefault()
+  if (
+    (e.key == "Backspace" || e.key == "Delete") &&
+    !Path.equals(editor.selection.anchor.path, editor.selection.focus.path)
+  ) {
+    e.preventDefault();
 
     // delete and set type the same as the before one
-    Transforms.delete(editor)
-    Transforms.setNodes(editor,priorElement[0],{at:priorElement[1]})
+    Transforms.delete(editor);
+    Transforms.setNodes(editor, priorElement[0], { at: priorElement[1] });
     // if (Path.isBefore(anchorElementPath, focusElementPath)) {
     //   // @ts-ignore
     //   Transforms.setNodes(editor,anchorElement,{at:anchorElementPath})
@@ -456,24 +467,30 @@ function addList(editor: BaseEditor) {
     }
 
     // check previous and next node
-    let curNode = nodes.at(-1)
-    if (!curNode) return
+    let curNode = nodes.at(-1);
+    if (!curNode) return;
 
-    let prevNode: Ancestor | undefined, nextNode: Ancestor |undefined
+    let prevNode: Ancestor | undefined, nextNode: Ancestor | undefined;
 
     try {
-      prevNode = Node.ancestor(editor,Path.previous(curNode[1]))
-      nextNode = Node.ancestor(editor,Path.next(curNode[1]))
-    } catch(e) {}
+      prevNode = Node.ancestor(editor, Path.previous(curNode[1]));
+      nextNode = Node.ancestor(editor, Path.next(curNode[1]));
+    } catch (e) {}
 
     // merge node
 
-    if (SlateEditor.isBlock(editor,nextNode) && (nextNode.type == "list" || nextNode.type == "listItemList")) {
-      Transforms.mergeNodes(editor, { at: Path.next(curNode[1])})
+    if (
+      SlateEditor.isBlock(editor, nextNode) &&
+      (nextNode.type == "list" || nextNode.type == "listItemList")
+    ) {
+      Transforms.mergeNodes(editor, { at: Path.next(curNode[1]) });
     }
 
-    if (SlateEditor.isBlock(editor,prevNode) && (prevNode.type == "list" || prevNode.type == "listItemList")) {
-      Transforms.mergeNodes(editor, { at: curNode[1]})
+    if (
+      SlateEditor.isBlock(editor, prevNode) &&
+      (prevNode.type == "list" || prevNode.type == "listItemList")
+    ) {
+      Transforms.mergeNodes(editor, { at: curNode[1] });
     }
   }
 }

@@ -3,14 +3,17 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "private":true,
+  "private": true,
   "scripts": {
     "dev:client": "cd ./client && npm run dev",
     "dev:server": "cd ./server && npm run start",
-    "dev":"concurrently \"npm run dev:server\" \"npm run dev:client\"",
-    "build":"cd ./server && tsc && vite build"
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "build": "cd ./server && tsc && vite build"
   },
   "author": "",
   "license": "ISC",
-  "workspaces": ["server","client"]
+  "workspaces": [
+    "server",
+    "client"
+  ]
 }

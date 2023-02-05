@@ -31,7 +31,7 @@ const router = createBrowserRouter([
               data = { message: "Not found", error: e };
             });
 
-          data.url = params.link
+          data.url = params.link;
           // return data;
           return data;
           // return data

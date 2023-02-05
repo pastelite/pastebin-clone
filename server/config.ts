@@ -3,5 +3,5 @@ export default {
   genUrl: 5,
   maxText: 50000,
   maxEditCode: 30,
-  genEditCode: 10
-}
+  genEditCode: 10,
+};

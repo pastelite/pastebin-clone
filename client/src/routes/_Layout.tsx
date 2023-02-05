@@ -9,9 +9,11 @@ function App({ children }: { children?: ReactNode }) {
   return (
     <div className="App">
       <Header />
-      <div className="flex-grow">
+      {/* <div className="grid place-items-center"> */}
+      <div className="flex-grow flex flex-col md:flex-row max-w-screen-lg w-screen m-auto">
         <Outlet />
       </div>
+      {/* </div> */}
       {/* <div id="content" contentEditable style={{flexGrow: "1"}}>
 
     </div>
